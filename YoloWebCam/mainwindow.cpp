@@ -10,6 +10,11 @@
 #include <QDateTime>
 #include <QFontMetrics>
 #include <QMessageBox>
+#include <QPainter>
+#include <QPen>
+#include <QTextStream>
+
+int currentTabIndex = 0;  // 0: Train, 1: Val
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(webcamWorker, &WebcamWorker::frameReady, this, &MainWindow::updateFrame);
     connect(this, &MainWindow::destroyed, this, &MainWindow::cleanupWorker);
     connect(ui->fileListWidget, &QListWidget::itemClicked, this, &MainWindow::on_fileItemClicked);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::on_tabWidget_currentChanged);
 
     connect(ui->actionSetPath, &QAction::triggered, this, &MainWindow::openFolder);
 
@@ -78,8 +84,10 @@ void MainWindow::on_captureButton_clicked()
         return;
     }
 
+    QString subFolder = (currentTabIndex == 0) ? "train" : "val";
+
     QString timestamp = QDateTime::currentDateTime().toString("yyyyMMddHHmmss");
-    QString savePath = currentDirectory + "/images/capture_" + timestamp + ".jpg";
+    QString savePath = currentDirectory + "/images/" + subFolder + "/capture_" + timestamp + ".jpg";
 
     if (currentFrame.save(savePath)) {
         refreshFileList(); // 캡처 후 리스트 갱신
@@ -88,6 +96,7 @@ void MainWindow::on_captureButton_clicked()
         qWarning("Failed to save image.");
     }
 }
+
 
 void MainWindow::on_setDirButton_clicked()
 {
@@ -104,12 +113,24 @@ void MainWindow::openFolder()
     currentDirectory = dir; // 현재 디렉토리 기억
 
     refreshFileList(); // 리스트 갱신
+
+    ui->captureButton->setDisabled(false);
+    ui->prevButton->setDisabled(false);
+    ui->fileDeleteButton->setDisabled(false);
+    ui->nextButton->setDisabled(false);
 }
 
 void MainWindow::refreshFileList()
 {
-    QString imagesPath = currentDirectory + "/images/";
-    QString labelsPath = currentDirectory + "/labels/";
+    QString imagesPath, labelsPath;
+
+    if (currentTabIndex == 0) { // Train 탭
+        imagesPath = currentDirectory + "/images/train/";
+        labelsPath = currentDirectory + "/labels/train/";
+    } else { // Val 탭
+        imagesPath = currentDirectory + "/images/val/";
+        labelsPath = currentDirectory + "/labels/val/";
+    }
 
     QDir imagesDir(imagesPath);
     QDir labelsDir(labelsPath);
@@ -117,17 +138,23 @@ void MainWindow::refreshFileList()
     bool needCreate = false;
     QString missingFolders;
 
-    // 먼저 없는 폴더 체크
     if (!imagesDir.exists()) {
-        missingFolders += "images/ ";
+        if (currentTabIndex == 0) { // Train 탭
+            missingFolders += "images/train ";
+        } else {
+            missingFolders += "images/val ";
+        }
         needCreate = true;
     }
     if (!labelsDir.exists()) {
-        missingFolders += "labels/ ";
+        if (currentTabIndex == 0) { // Train 탭
+            missingFolders += "labels/train ";
+        } else {
+            missingFolders += "labels/val ";
+        }
         needCreate = true;
     }
 
-    // 🔥 둘 중 하나라도 없으면 한 번만 물어본다
     if (needCreate) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
@@ -137,7 +164,6 @@ void MainWindow::refreshFileList()
         );
 
         if (reply == QMessageBox::Yes) {
-            // 필요한 폴더만 생성
             if (!imagesDir.exists() && !imagesDir.mkpath(".")) {
                 qWarning("Failed to create images folder!");
                 return;
@@ -164,32 +190,22 @@ void MainWindow::refreshFileList()
     for (const QFileInfo &entry : entries) {
         QString baseName = entry.completeBaseName();  // 파일명 (확장자 제거)
 
-        // 레이블 파일 존재 여부 확인
         QString labelFilePath = labelsPath + baseName + ".txt";
         bool labelExists = QFile::exists(labelFilePath);
 
-        // 리스트 항목 추가
         QListWidgetItem* item = new QListWidgetItem(entry.fileName());
         if (labelExists) {
-            item->setForeground(Qt::blue); // 파란색
+            item->setForeground(Qt::blue);
         } else {
-            item->setForeground(Qt::red); // 빨간색
+            item->setForeground(Qt::red);
         }
         ui->fileListWidget->addItem(item);
     }
 
-    // 이미지 정보 라벨 업데이트
     int fileCount = entries.count();
     ui->imageInfoLabel->setText(QString("0 / %1").arg(fileCount));
-
-    ui->captureButton->setDisabled(false);
-    ui->prevButton->setDisabled(false);
-    ui->fileDeleteButton->setDisabled(false);
-    ui->nextButton->setDisabled(false);
-
     updatePathLabel(currentDirectory);
 }
-
 
 void MainWindow::updatePathLabel(const QString& path)
 {
@@ -210,10 +226,12 @@ void MainWindow::on_fileItemClicked(QListWidgetItem* item)
         workerThread->wait();
     }
 
-    // 2. 선택된 파일 이름
-    QString fileName = item->text();
+    // 2. 현재 탭에 따라 이미지/레이블 경로 결정
+    QString subFolder = (currentTabIndex == 0) ? "train" : "val";
 
-    QString imagePath = currentDirectory + "/images/" + fileName;
+    QString fileName = item->text();
+    QString imagePath = currentDirectory + "/images/" + subFolder + "/" + fileName;
+    QString labelPath = currentDirectory + "/labels/" + subFolder + "/" + QFileInfo(fileName).completeBaseName() + ".txt";
 
     // 3. 이미지 로드
     QImage image;
@@ -222,11 +240,48 @@ void MainWindow::on_fileItemClicked(QListWidgetItem* item)
         return;
     }
 
-    currentFrame = image; // currentFrame 업데이트
-    setImage(image);      // QLabel에 띄우기
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QPainter painter(&pixmap);
+    painter.setPen(QPen(Qt::red, 2)); // 빨간색, 굵기 2
 
-    // 4. 선택된 파일 인덱스 업데이트
-    int selectedIndex = ui->fileListWidget->row(item) + 1; // (리스트는 0부터 시작하니까 +1)
+    // 4. 라벨 파일 읽기
+    QFile labelFile(labelPath);
+    if (labelFile.exists() && labelFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&labelFile);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList parts = line.split(' ');
+            if (parts.size() != 5)
+                continue; // 포맷 이상하면 건너뛴다
+
+            // YOLO 포맷: class_id x_center y_center width height
+            float x_center = parts[1].toFloat();
+            float y_center = parts[2].toFloat();
+            float width = parts[3].toFloat();
+            float height = parts[4].toFloat();
+
+            int imgWidth = pixmap.width();
+            int imgHeight = pixmap.height();
+
+            QRectF box(
+                (x_center - width / 2) * imgWidth,
+                (y_center - height / 2) * imgHeight,
+                width * imgWidth,
+                height * imgHeight
+            );
+
+            painter.drawRect(box);
+        }
+        labelFile.close();
+    }
+
+    painter.end();
+
+    currentFrame = pixmap.toImage(); // currentFrame 업데이트
+    setImage(currentFrame);          // QLabel에 띄우기
+
+    // 5. 선택된 파일 인덱스 업데이트
+    int selectedIndex = ui->fileListWidget->row(item) + 1;
     int totalCount = ui->fileListWidget->count();
 
     ui->imageInfoLabel->setText(QString("%1 / %2").arg(selectedIndex).arg(totalCount));
@@ -279,9 +334,11 @@ void MainWindow::on_fileDeleteButton_clicked()
         return;
     }
 
+    QString subFolder = (currentTabIndex == 0) ? "train" : "val";
+
     QString fileName = item->text();
-    QString imagePath = currentDirectory + "/images/" + fileName;
-    QString labelPath = currentDirectory + "/labels/" + QFileInfo(fileName).completeBaseName() + ".txt";
+    QString imagePath = currentDirectory + "/images/" + subFolder + "/" + fileName;
+    QString labelPath = currentDirectory + "/labels/" + subFolder + "/" + QFileInfo(fileName).completeBaseName() + ".txt";
 
     // 🔥 정말 삭제할지 물어보기
     QMessageBox::StandardButton reply;
@@ -318,3 +375,12 @@ void MainWindow::on_fileDeleteButton_clicked()
     }
 }
 
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if (currentDirectory.isEmpty())
+        return;
+
+    currentTabIndex = index;
+    refreshFileList();
+}

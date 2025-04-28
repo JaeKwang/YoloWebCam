@@ -35,7 +35,7 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="sidePanelLayout" stretch="0,0,0,0,0,0">
+     <layout class="QVBoxLayout" name="sidePanelLayout" stretch="0,0,0,0,0,0,0">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
         <item>
@@ -44,7 +44,7 @@
            <set>Qt::ImhNone</set>
           </property>
           <property name="text">
-           <string/>
+           <string>Workspace를 지정해 주세요</string>
           </property>
           <property name="wordWrap">
            <bool>false</bool>
@@ -91,6 +91,35 @@
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Train</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Val</string>
+         </attribute>
+        </widget>
        </widget>
       </item>
       <item>

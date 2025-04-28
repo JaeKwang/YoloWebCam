@@ -31,14 +31,11 @@ private slots:
     void openFolder();
     void on_fileItemClicked(QListWidgetItem* item);
     void resumeWebcam();
-
     void on_webcamButton_clicked();
-
     void on_prevButton_clicked();
-
     void on_nextButton_clicked();
-
     void on_fileDeleteButton_clicked();
+    void on_tabWidget_currentChanged(int index);
 
 private:
     Ui::MainWindow *ui;
