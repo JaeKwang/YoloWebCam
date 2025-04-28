@@ -9,6 +9,8 @@
 #include "webcamworker.h"
 #include <QThread>
 #include <QListWidgetItem>
+#include <QMap> // 추가
+#include <QStringList> // 추가
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,19 +38,26 @@ private slots:
     void on_nextButton_clicked();
     void on_fileDeleteButton_clicked();
     void on_tabWidget_currentChanged(int index);
+    void on_newClassButton_clicked();
+    void on_deleteClassButton_clicked();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
     QImage currentFrame;            // 마지막 프레임 저장
 
-    void setImage(const QImage& image);
-    QImage cvMatToQImage(const cv::Mat &mat);
-    void updatePathLabel(const QString& path);
-
     QString currentDirectory;  // 현재 폴더 경로 저장
+    QMap<int, QString> classNames;
 
     WebcamWorker *webcamWorker;
     QThread *workerThread;
+
+    void setImage(const QImage& image);
+    QImage cvMatToQImage(const cv::Mat &mat);
+    void updatePathLabel(const QString& path);
+    void loadClassNames(const QString& yamlPath);
 };
 
 #endif // MAINWINDOW_H
