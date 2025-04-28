@@ -6,6 +6,9 @@
 #include <QTimer>
 #include <QPixmap>
 #include <opencv2/opencv.hpp>  // OpenCV 사용
+#include "webcamworker.h"
+#include <QThread>
+#include <QListWidgetItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,17 +23,35 @@ public:
     ~MainWindow();
 
 private slots:
-    void startCamera();
-    void captureFrame();
+    void updateFrame(const QImage &frame);
+    void cleanupWorker();
+    void on_setDirButton_clicked();
+    void on_captureButton_clicked();
+    void refreshFileList();
+    void openFolder();
+    void on_fileItemClicked(QListWidgetItem* item);
+    void resumeWebcam();
+
+    void on_webcamButton_clicked();
+
+    void on_prevButton_clicked();
+
+    void on_nextButton_clicked();
+
+    void on_fileDeleteButton_clicked();
 
 private:
     Ui::MainWindow *ui;
-    QTimer *timer;                 // 프레임 캡처용 타이머
-    cv::VideoCapture cap;           // OpenCV 웹캠 캡처
     QImage currentFrame;            // 마지막 프레임 저장
 
     void setImage(const QImage& image);
     QImage cvMatToQImage(const cv::Mat &mat);
+    void updatePathLabel(const QString& path);
+
+    QString currentDirectory;  // 현재 폴더 경로 저장
+
+    WebcamWorker *webcamWorker;
+    QThread *workerThread;
 };
 
 #endif // MAINWINDOW_H

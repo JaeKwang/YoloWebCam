@@ -12,10 +12,12 @@ LIBS += -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lope
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    webcamworker.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    webcamworker.h
 
 FORMS += \
     mainwindow.ui
