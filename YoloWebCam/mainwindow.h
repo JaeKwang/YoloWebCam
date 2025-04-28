@@ -40,6 +40,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_newClassButton_clicked();
     void on_deleteClassButton_clicked();
+    void setupImageLabel();
+    void onBoxCreated(const QRectF& rect);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

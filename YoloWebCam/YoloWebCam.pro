@@ -16,6 +16,7 @@ SOURCES += \
     webcamworker.cpp
 
 HEADERS += \
+    imagelabel.h \
     mainwindow.h \
     webcamworker.h
 

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "imagelabel.h"
 
 #include <QTimer>
 #include <QImage>
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setupImageLabel();
     ui->videoLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     webcamWorker = new WebcamWorker();
@@ -37,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::destroyed, this, &MainWindow::cleanupWorker);
     connect(ui->fileListWidget, &QListWidget::itemClicked, this, &MainWindow::on_fileItemClicked);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::on_tabWidget_currentChanged);
-
     connect(ui->actionSetPath, &QAction::triggered, this, &MainWindow::openFolder);
+    connect(qobject_cast<ImageLabel*>(ui->videoLabel), &ImageLabel::boxCreated, this, &MainWindow::onBoxCreated);
 
 
     workerThread->start();
@@ -75,6 +77,31 @@ void MainWindow::setImage(const QImage& image)
 
     ui->videoLabel->setPixmap(scaledPixmap);
 }
+
+void MainWindow::setupImageLabel()
+{
+        // 기존 videoLabel 지우고
+        QWidget* oldLabel = ui->videoLabel;
+        int index = ui->mainLayout->indexOf(oldLabel);
+        if (index >= 0) {
+            ui->mainLayout->removeWidget(oldLabel);
+        }
+        delete oldLabel;
+
+        // 새로운 ImageLabel 생성
+        ImageLabel* newLabel = new ImageLabel(this);
+        newLabel->setObjectName("videoLabel"); // 중요: 이름 똑같이
+        newLabel->setFrameShape(QFrame::Box);
+        newLabel->setAlignment(Qt::AlignCenter);
+        newLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+        // 레이아웃에 기존 위치에 다시 추가
+        ui->mainLayout->insertWidget(index, newLabel, /*stretch=*/4);
+
+        // videoLabel 포인터 재할당
+        ui->videoLabel = newLabel;
+}
+
 
 void MainWindow::on_captureButton_clicked()
 {
@@ -650,4 +677,60 @@ void MainWindow::on_deleteClassButton_clicked()
         // 갱신
         loadClassNames(yamlPath);
 }
+
+#include <qdebug.h>
+void MainWindow::onBoxCreated(const QRectF& rect)
+{
+    if (currentFrame.isNull()) {
+        qWarning("No current image to label.");
+        return;
+    }
+
+    if(ui->classListWidget->currentRow() == -1 || ui->fileListWidget->currentRow() == -1) return;
+
+    int selectedClassId = ui->classListWidget->currentRow();
+    QString currentImagePath = ui->fileListWidget->currentItem()->text();
+
+    // 현재 QLabel에 표시된 이미지 사이즈 (비율 유지됨)
+    QSize labelSize = ui->videoLabel->size();
+    QSize imageSize = currentFrame.size();
+
+    double scaleX = double(imageSize.width()) / labelSize.width();
+    double scaleY = double(imageSize.height()) / labelSize.height();
+
+    // 🔥 rect를 이미지 좌표계로 환산
+    double x = rect.x() * scaleX;
+    double y = rect.y() * scaleY;
+    double w = rect.width() * scaleX;
+    double h = rect.height() * scaleY;
+
+    double x_center = (x + w / 2.0) / imageSize.width();
+    double y_center = (y + h / 2.0) / imageSize.height();
+    double width = w / imageSize.width();
+    double height = h / imageSize.height();
+
+    // 🔥 정규화된 YOLO 포맷 완성
+    QString yoloFormat = QString("%1 %2 %3 %4 %5")
+                         .arg(selectedClassId) // 현재 선택된 클래스
+                         .arg(QString::number(x_center, 'f', 6))
+                         .arg(QString::number(y_center, 'f', 6))
+                         .arg(QString::number(width, 'f', 6))
+                         .arg(QString::number(height, 'f', 6));
+
+    qDebug() << "YOLO label:" << yoloFormat;
+
+    // 🔥 파일에 추가 저장
+    QString baseName = QFileInfo(currentImagePath).completeBaseName();
+    QString labelPath = currentDirectory + "/labels/" + baseName + ".txt";
+
+    QFile file(labelPath);
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << yoloFormat << "\n";
+        file.close();
+    } else {
+        qWarning("Failed to open label file for writing.");
+    }
+}
+
 
