@@ -1,0 +1,64 @@
+# -------- 기본 C++ 빌드 파일 무시 --------
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+
+# -------- Qt Creator 자동 생성 파일 무시 --------
+Makefile
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+*.autosave
+
+# MOC (Meta-Object Compiler) 자동 생성 파일
+moc_*.cpp
+moc_*.h
+
+# UIC (User Interface Compiler) 자동 생성 파일
+ui_*.h
+
+# RCC (Resource Compiler) 자동 생성 파일
+qrc_*.cpp
+
+# CMake 관련 파일 무시 (만약 CMake 사용 시)
+CMakeLists.txt.user
+build-*/
+cmake-build-*/
+
+# Qt Creator 빌드 디렉토리 무시
+build-*/
+
+# 코드 편집기 설정 파일 무시
+*.log
+*.db
+*.pyc
+*.pyo
+*.swp
+
+# macOS 기본
+.DS_Store
+
+# Linux 기본
+*.~ 
+*#
+
+# Windows 기본
+Thumbs.db
+desktop.ini
+
+# venv 같은 파이썬 가상환경 폴더 무시 (YOLO 서버 프로젝트할 때 대비)
+venv/
+.env/
+__pycache__/
+
+# YOLO 모델 weight 파일 무시 (너무 크니까)
+*.pt
+*.onnx
+
+# 기타
+*.bak
