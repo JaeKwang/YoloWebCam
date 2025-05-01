@@ -30,3 +30,6 @@ Python 서버를 통해 YOLOv8 모델을 로딩하고, C++ 클라이언트가 �
 ```bash
 sudo apt update
 sudo apt install libopencv-dev
+
+# QT 다운로드
+pip install PySide6

@@ -5,12 +5,13 @@
 #include <QImage>
 #include <QTimer>
 #include <QPixmap>
-#include <opencv2/opencv.hpp>  // OpenCV 사용
-#include "webcamworker.h"
+#include <opencv2/opencv.hpp>
 #include <QThread>
 #include <QListWidgetItem>
-#include <QMap> // 추가
-#include <QStringList> // 추가
+#include <QMap>
+#include <QStringList>
+#include "webcamworker.h"
+#include "inferenceworker.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -42,6 +43,8 @@ private slots:
     void on_deleteClassButton_clicked();
     void setupImageLabel();
     void onBoxCreated(const QRectF& rect);
+    void loadModel();
+    void onInferenceCompleted(const QImage& resultImage, double ms);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -53,8 +56,14 @@ private:
     QString currentDirectory;  // 현재 폴더 경로 저장
     QMap<int, QString> classNames;
 
-    WebcamWorker *webcamWorker;
+    //
     QThread *workerThread;
+    WebcamWorker *webcamWorker;
+
+    // MainWindow.h
+    QThread *inferenceThread;
+    InferenceWorker *inferenceWorker;
+
 
     void setImage(const QImage& image);
     QImage cvMatToQImage(const cv::Mat &mat);

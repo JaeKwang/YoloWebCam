@@ -18,7 +18,10 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
 
+cv::dnn::Net net;
 int currentTabIndex = 0;  // 0: Train, 1: Val
 
 MainWindow::MainWindow(QWidget *parent)
@@ -29,21 +32,29 @@ MainWindow::MainWindow(QWidget *parent)
     setupImageLabel();
     ui->videoLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
+    // 웹캠 Thread
     webcamWorker = new WebcamWorker();
     workerThread = new QThread();
-
     webcamWorker->moveToThread(workerThread);
+
+    // 네트워크 Thread
+    inferenceThread = new QThread(this);
+    inferenceWorker = new InferenceWorker();
+    inferenceWorker->moveToThread(inferenceThread);
 
     connect(workerThread, &QThread::started, webcamWorker, &WebcamWorker::start);
     connect(webcamWorker, &WebcamWorker::frameReady, this, &MainWindow::updateFrame);
+    connect(inferenceWorker, &InferenceWorker::inferenceCompleted, this, &MainWindow::onInferenceCompleted);
     connect(this, &MainWindow::destroyed, this, &MainWindow::cleanupWorker);
     connect(ui->fileListWidget, &QListWidget::itemClicked, this, &MainWindow::on_fileItemClicked);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::on_tabWidget_currentChanged);
     connect(ui->actionSetPath, &QAction::triggered, this, &MainWindow::openFolder);
     connect(qobject_cast<ImageLabel*>(ui->videoLabel), &ImageLabel::boxCreated, this, &MainWindow::onBoxCreated);
 
+    loadModel();
 
     workerThread->start();
+    inferenceThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -51,20 +62,70 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::loadModel()
+{
+    net = cv::dnn::readNetFromONNX("/home/park/ws/YoloWebCam/pt2onnx/best.onnx");
+
+    if (net.empty()) {
+        qWarning("Failed to load ONNX model.");
+        return;
+    }
+
+    net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);  // CUDA 사용
+    net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);    // GPU 사용
+
+    inferenceWorker->setModel(net);
+}
+
+void MainWindow::onInferenceCompleted(const QImage& resultImage, double ms)
+{
+    setImage(resultImage);
+
+    // 처리 시간 표시
+    ui->statusbar->showMessage(QString("Inference Time: %1 ms").arg(ms, 0, 'f', 2));
+}
+
 void MainWindow::updateFrame(const QImage &frame)
 {
     currentFrame = frame;
-    setImage(currentFrame);
+    setImage(currentFrame);  // 원본 표시용
+
+    // QImage → cv::Mat 변환
+    cv::Mat mat(frame.height(), frame.width(), CV_8UC3, const_cast<uchar*>(frame.bits()), frame.bytesPerLine());
+    cv::Mat matRGB;
+    cv::cvtColor(mat, matRGB, cv::COLOR_RGB2BGR);
+
+    // 🔥 inferenceWorker에 전달 (invokeMethod → 스레드 전송 안전하게)
+    QMetaObject::invokeMethod(inferenceWorker, "processFrame", Qt::QueuedConnection, Q_ARG(cv::Mat, matRGB));
 }
 
 void MainWindow::cleanupWorker()
 {
-    webcamWorker->stop();
-    workerThread->quit();
-    workerThread->wait();
-    delete webcamWorker;
-    delete workerThread;
+    // 웹캠 스레드 종료
+    if (webcamWorker) {
+        webcamWorker->stop();
+    }
+
+    if (workerThread) {
+        workerThread->quit();
+        workerThread->wait();
+        delete webcamWorker;
+        delete workerThread;
+        webcamWorker = nullptr;
+        workerThread = nullptr;
+    }
+
+    // 추론 스레드 종료
+    if (inferenceThread) {
+        inferenceThread->quit();
+        inferenceThread->wait();
+        delete inferenceWorker;
+        delete inferenceThread;
+        inferenceWorker = nullptr;
+        inferenceThread = nullptr;
+    }
 }
+
 
 void MainWindow::setImage(const QImage& image)
 {
@@ -732,5 +793,4 @@ void MainWindow::onBoxCreated(const QRectF& rect)
         qWarning("Failed to open label file for writing.");
     }
 }
-
 
