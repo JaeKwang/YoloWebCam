@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 6.0.2, 2025-05-02T06:49:38. -->
+<!-- Written by QtCreator 6.0.2, 2025-05-02T14:54:19. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -94,7 +94,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{6702e21c-f471-475d-bc6c-31242cd3e407}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">-1</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">2</value>
    <value type="int" key="ProjectExplorer.Target.BuildConfigurationCount">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.DeployConfiguration.0">
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
@@ -116,16 +116,16 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloPyQT/mainwindow.py</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloPyQT/mainwindow.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloPyQT/mainwindow.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloWebCam/YoloPyQT/mainwindow.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloWebCam/YoloPyQT/mainwindow.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloWebCam/YoloPyQT/mainwindow.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{f7f9df70-4e2d-4eb8-be35-161d8ab89abe}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloPyQT/mainwindow.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloWebCam/YoloPyQT/mainwindow.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloPyQT</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloWebCam/YoloPyQT</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.1">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -134,16 +134,16 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloPyQT/main.py</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloPyQT/main.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloPyQT/main.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloWebCam/YoloPyQT/image_label.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloWebCam/YoloPyQT/image_label.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloWebCam/YoloPyQT/image_label.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{f7f9df70-4e2d-4eb8-be35-161d8ab89abe}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloPyQT/main.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloWebCam/YoloPyQT/image_label.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloPyQT</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloWebCam/YoloPyQT</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.2">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -152,16 +152,16 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloPyQT/webcam_worker.py</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloPyQT/webcam_worker.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloPyQT/webcam_worker.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloWebCam/YoloPyQT/main.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloWebCam/YoloPyQT/main.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloWebCam/YoloPyQT/main.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{f7f9df70-4e2d-4eb8-be35-161d8ab89abe}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloPyQT/webcam_worker.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloWebCam/YoloPyQT/main.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloPyQT</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloWebCam/YoloPyQT</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.3">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -170,16 +170,16 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloPyQT/inference_worker.py</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloPyQT/inference_worker.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloPyQT/inference_worker.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloWebCam/YoloPyQT/inference_worker.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloWebCam/YoloPyQT/inference_worker.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloWebCam/YoloPyQT/inference_worker.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{f7f9df70-4e2d-4eb8-be35-161d8ab89abe}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloPyQT/inference_worker.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloWebCam/YoloPyQT/inference_worker.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloPyQT</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloWebCam/YoloPyQT</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.4">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -188,16 +188,16 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloPyQT/image_label.py</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloPyQT/image_label.py</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloPyQT/image_label.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/park/ws/YoloWebCam/YoloPyQT/webcam_worker.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/park/ws/YoloWebCam/YoloPyQT/webcam_worker.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/park/ws/YoloWebCam/YoloPyQT/webcam_worker.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{f7f9df70-4e2d-4eb8-be35-161d8ab89abe}</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloPyQT/image_label.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/park/ws/YoloWebCam/YoloPyQT/webcam_worker.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloPyQT</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/park/ws/YoloWebCam/YoloPyQT</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">5</value>
   </valuemap>

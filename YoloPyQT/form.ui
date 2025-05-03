@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>768</height>
+    <width>1215</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,14 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="mainLayout" stretch="1,4,1">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1,0,0,4,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1,0,0,0,6,0,6,0">
       <item>
        <widget class="QLabel" name="label_inf">
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>[추론 네트워크]</string>
         </property>
@@ -34,6 +39,14 @@
         </property>
         <item>
          <widget class="QLabel" name="weightLabel">
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(237, 51, 59);</string>
+          </property>
           <property name="text">
            <string>Weight 파일을 선택하세요</string>
           </property>
@@ -59,6 +72,11 @@
             <height>24</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -73,6 +91,11 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>추론 시작</string>
           </property>
@@ -82,6 +105,11 @@
          <widget class="QPushButton" name="InfStopButton">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>추론 중지</string>
@@ -108,6 +136,11 @@
       </item>
       <item>
        <widget class="QLabel" name="label_class">
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>[클래스]</string>
         </property>
@@ -119,6 +152,11 @@
          <widget class="QLineEdit" name="classNameEdit">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
           </property>
          </widget>
         </item>
@@ -133,6 +171,11 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>추가</string>
           </property>
@@ -141,7 +184,30 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="classListWidget"/>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>클래스 목록</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="classListWidget">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>저장된 클래스 목록</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="savedClassListWidget"/>
       </item>
       <item>
        <widget class="QPushButton" name="deleteClassButton">
@@ -159,6 +225,11 @@
           <width>16777215</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>🗑</string>
@@ -190,6 +261,11 @@
      <layout class="QVBoxLayout" name="sidePanelLayout" stretch="0,0,0,0,0,0,0,0">
       <item>
        <widget class="QLabel" name="label_ws">
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>[Yolov8 작업 폴더]</string>
         </property>
@@ -202,6 +278,14 @@
         </property>
         <item>
          <widget class="QLabel" name="pathLabel">
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(237, 51, 59);</string>
+          </property>
           <property name="inputMethodHints">
            <set>Qt::ImhNone</set>
           </property>
@@ -235,6 +319,7 @@
           </property>
           <property name="font">
            <font>
+            <pointsize>16</pointsize>
             <kerning>true</kerning>
            </font>
           </property>
@@ -247,6 +332,11 @@
       </item>
       <item>
        <widget class="QLabel" name="imageInfoLabel">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>0 / 0</string>
         </property>
@@ -269,6 +359,11 @@
           <height>29</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -285,7 +380,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="fileListWidget"/>
+       <widget class="QListWidget" name="fileListWidget">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -299,6 +400,11 @@
             <width>0</width>
             <height>31</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>⬅️</string>
@@ -322,6 +428,11 @@
             <height>31</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>🗑</string>
           </property>
@@ -338,6 +449,11 @@
             <height>31</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>➡️</string>
           </property>
@@ -350,6 +466,11 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>캡쳐</string>
         </property>
@@ -359,6 +480,11 @@
        <widget class="QPushButton" name="webcamButton">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>웹캠으로 돌아가기</string>
@@ -374,7 +500,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>1215</width>
      <height>28</height>
     </rect>
    </property>

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QMainWindow, QFileDialog, QListWidgetItem, QMessag
 from PySide6.QtGui import QPixmap, QImage, QPainter, QPen, QColor
 from webcam_worker import WebcamWorker
 from inference_worker import InferenceWorker
-from image_label import ImageLabel  # ✅ 커스텀 QLabel
+from image_label import ImageLabel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -57,6 +57,8 @@ class MainWindow(QMainWindow):
         self.ui.fileDeleteButton.clicked.connect(self.on_file_delete_button_clicked)
         self.ui.InfStartButton.clicked.connect(self.on_start_inference_clicked)
         self.ui.InfStopButton.clicked.connect(self.on_stop_inference_clicked)
+        self.ui.videoLabel.rectDrawn.connect(self.save_drawn_box)
+        self.showMaximized()
 
     def load_ui(self, parent=None):
         from PySide6.QtUiTools import QUiLoader
@@ -129,8 +131,12 @@ class MainWindow(QMainWindow):
         if not dir:
             return
 
+        prevDir = self.current_directory
         self.current_directory = dir
-        self.refresh_file_list()
+        if not self.refresh_file_list():
+            self.current_directory = prevDir
+            return
+
         self.load_class_names(os.path.join(self.current_directory, "data.yaml"))
         self.resume_webcam()
 
@@ -156,6 +162,7 @@ class MainWindow(QMainWindow):
         self.infer_worker.set_model(file_path)
         metrics = self.ui.weightLabel.fontMetrics()
         elided = metrics.elidedText(file_path, Qt.ElideMiddle, self.ui.weightLabel.width())
+        self.ui.weightLabel.setStyleSheet("color: black;")
         self.ui.weightLabel.setText(elided)
         self.on_stop_inference_clicked()
         self.weightFileLoad = True
@@ -211,6 +218,7 @@ class MainWindow(QMainWindow):
             for idx, name in enumerate(name.strip() for name in name_list if name.strip()):
                 self.class_names[idx] = name
                 self.ui.classListWidget.addItem(f"{idx}: {name}")
+            self.ui.classListWidget.setCurrentRow(0)
 
     def refresh_file_list(self):
         from PySide6.QtCore import QDir
@@ -242,7 +250,7 @@ class MainWindow(QMainWindow):
                 if not labels_dir.exists():
                     QDir().mkpath(labels_path)
             else:
-                return
+                return False
         self.ui.fileListWidget.clear()
         filters = ["*.png", "*.jpg", "*.jpeg", "*.bmp"]
         images_dir.setNameFilters(filters)
@@ -287,6 +295,7 @@ class MainWindow(QMainWindow):
             self.ui.fileListWidget.addItem(item)
         self.ui.imageInfoLabel.setText(f"0 / {len(entries)}")
         self.update_path_label(self.current_directory)
+        return True
 
     def on_set_dir_button_clicked(self):
         self.open_folder()
@@ -297,6 +306,7 @@ class MainWindow(QMainWindow):
     def update_path_label(self, path):
         metrics = self.ui.pathLabel.fontMetrics()
         elided = metrics.elidedText(path, Qt.ElideMiddle, self.ui.pathLabel.width())
+        self.ui.pathLabel.setStyleSheet("color: black;")
         self.ui.pathLabel.setText(elided)
 
     def on_capture_button_clicked(self):
@@ -549,3 +559,5 @@ class MainWindow(QMainWindow):
 
         self.load_class_names(yaml_path)
 
+    def save_drawn_box(self, xc, yc, w, h):
+        print(f"{xc:.6f} {yc:.6f} {w:.6f} {h:.6f}\n")
