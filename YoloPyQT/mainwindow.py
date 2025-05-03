@@ -21,10 +21,12 @@ class MainWindow(QMainWindow):
         self.weightFileLoad = False
         self.is_image_preview = False
         self.last_preview_image_path = ""
+        self.last_preview_label_path = ""
         self.current_directory = ""
         self.current_tab_index = 0
         self.current_frame = QImage()
         self.last_boxes = []
+        self.saved_boxes = []
         self.class_names = {}
         self.last_infer_time = 0
 
@@ -47,10 +49,11 @@ class MainWindow(QMainWindow):
         self.ui.setWeightButton.clicked.connect(self.on_set_weight_button_clicked)
         self.ui.captureButton.clicked.connect(self.on_capture_button_clicked)
         self.ui.setDirButton.clicked.connect(self.on_set_dir_button_clicked)
-        self.ui.fileListWidget.itemClicked.connect(self.on_file_item_clicked)
+        self.ui.fileListWidget.currentRowChanged.connect(self.on_file_item_changed)
         self.ui.tabWidget.currentChanged.connect(self.on_tab_widget_changed)
         self.ui.newClassButton.clicked.connect(self.on_new_class_button_clicked)
         self.ui.deleteClassButton.clicked.connect(self.on_delete_class_button_clicked)
+        self.ui.deleteSavedClassButton.clicked.connect(self.on_delete_saved_label_clicked)
         self.ui.webcamButton.clicked.connect(self.resume_webcam)
         self.ui.prevButton.clicked.connect(self.on_prev_button_clicked)
         self.ui.nextButton.clicked.connect(self.on_next_button_clicked)
@@ -58,6 +61,7 @@ class MainWindow(QMainWindow):
         self.ui.InfStartButton.clicked.connect(self.on_start_inference_clicked)
         self.ui.InfStopButton.clicked.connect(self.on_stop_inference_clicked)
         self.ui.videoLabel.rectDrawn.connect(self.save_drawn_box)
+        self.ui.savedClassListWidget.currentRowChanged.connect(self.on_saved_label_clicked)
         self.showMaximized()
 
     def load_ui(self, parent=None):
@@ -114,8 +118,6 @@ class MainWindow(QMainWindow):
 
             self.current_frame = image  # ✅ 현재 프레임으로 설정
             self.ui.videoLabel.setImage(QPixmap.fromImage(image), self.last_boxes)
-        else:
-            print("[INFO] 이미지 미리보기 상태가 아님, 무시됨")
 
     def closeEvent(self, event):
         self.webcam_worker.stop()
@@ -147,6 +149,7 @@ class MainWindow(QMainWindow):
         self.ui.prevButton.setDisabled(False)
         self.ui.fileDeleteButton.setDisabled(False)
         self.ui.nextButton.setDisabled(False)
+        self.ui.EditCheckBox.setDisabled(False)
 
     def open_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -265,33 +268,38 @@ class MainWindow(QMainWindow):
                 try:
                     valid = True
                     with open(label_path, 'r') as f:
-                        for line in f:
-                            parts = line.strip().split()
-                            if len(parts) != 5:
-                                valid = False
-                                break
-                            try:
-                                cid = int(parts[0])
-                                xc, yc, w, h = map(float, parts[1:])
-                                if not (0 <= xc <= 1 and 0 <= yc <= 1 and 0 <= w <= 1 and 0 <= h <= 1):
+                        lines = f.readlines()
+                        if not lines:
+                            valid = False  # 🔥 빈 파일은 잘못된 포맷으로 간주
+                        else:
+                            for line in lines:
+                                parts = line.strip().split()
+                                if len(parts) != 5:
                                     valid = False
                                     break
-                                if cid < 0:
+                                try:
+                                    cid = int(parts[0])
+                                    xc, yc, w, h = map(float, parts[1:])
+                                    if not (0 <= xc <= 1 and 0 <= yc <= 1 and 0 <= w <= 1 and 0 <= h <= 1):
+                                        valid = False
+                                        break
+                                    if cid < 0:
+                                        valid = False
+                                        break
+                                except ValueError:
                                     valid = False
                                     break
-                            except ValueError:
-                                valid = False
-                                break
 
                     if valid:
-                        item.setForeground(Qt.blue)     # 유효한 라벨
+                        item.setForeground(Qt.blue)  # 유효한 라벨
                     else:
-                        item.setForeground(QColor("orange"))  # 형식 오류 라벨
+                        item.setForeground(QColor("orange"))  # 🔥 형식 오류 or 빈 파일
                 except Exception as e:
                     print(f"[ERROR] Failed to read label: {label_path} - {e}")
                     item.setForeground(QColor("orange"))
             else:
-                item.setForeground(Qt.red)  # 레이블 없음
+                item.setForeground(Qt.red)  # 🔴 라벨 없음
+
             self.ui.fileListWidget.addItem(item)
         self.ui.imageInfoLabel.setText(f"0 / {len(entries)}")
         self.update_path_label(self.current_directory)
@@ -332,13 +340,17 @@ class MainWindow(QMainWindow):
 
     def resume_webcam(self):
         self.is_image_preview = False
+        self.saved_boxes.clear()
+        self.ui.savedClassListWidget.clear()
+        self.ui.EditCheckBox.setChecked(False)
 
         if self.webcam_thread and not self.webcam_thread.isRunning():
             self.webcam_thread.start()
             self.ui.captureButton.setDisabled(False)
             self.ui.webcamButton.setDisabled(True)
 
-    def on_file_item_clicked(self, item):
+    def on_file_item_changed(self, index):
+        item = self.ui.fileListWidget.item(index)
         if not item:
             return
 
@@ -359,9 +371,13 @@ class MainWindow(QMainWindow):
             return
         
         self.last_preview_image_path = img_path
+        self.last_preview_label_path = label_path
         pixmap = QPixmap.fromImage(image)
         painter = QPainter(pixmap)
         painter.setPen(QPen(Qt.red, 2))
+        self.saved_boxes.clear()
+        self.ui.savedClassListWidget.clear()
+
         if os.path.exists(label_path):
             with open(label_path, 'r') as f:
                 for line in f:
@@ -378,10 +394,33 @@ class MainWindow(QMainWindow):
                         h * ih
                     )
                     painter.drawRect(rect)
+
+                    # Regist Saved Class Labels
                     if cid in self.class_names:
+                        self.saved_boxes.append({
+                            'class_id': cid,
+                            'label': self.class_names[cid],
+                            'rect': QRectF((xc - w/2) * iw, (yc - h/2) * ih, w * iw, h * ih)
+                        })
+                        label_name = self.class_names[cid]
+                        self.ui.savedClassListWidget.addItem(f"{label_name} ({cid})")
+
                         painter.setPen(Qt.green)
                         painter.drawText(rect.topLeft() + QPointF(2, 12), self.class_names[cid])
                         painter.setPen(QPen(Qt.red, 2))
+                    else:
+                        self.saved_boxes.append({
+                            'class_id': cid,
+                            'label': "NoName",
+                            'rect': QRectF((xc - w/2) * iw, (yc - h/2) * ih, w * iw, h * ih)
+                        })
+                        label_name = "NoName"
+                        self.ui.savedClassListWidget.addItem(f"{label_name} ({cid})")
+
+                        painter.setPen(Qt.green)
+                        painter.drawText(rect.topLeft() + QPointF(2, 12), "NoName")
+                        painter.setPen(QPen(Qt.red, 2))
+
         painter.end()
         self.current_frame = pixmap.toImage()
         self.ui.videoLabel.setImage(QPixmap.fromImage(self.current_frame), [])
@@ -406,17 +445,18 @@ class MainWindow(QMainWindow):
         row = self.ui.fileListWidget.currentRow()
         if row > 0:
             self.ui.fileListWidget.setCurrentRow(row - 1)
-            self.on_file_item_clicked(self.ui.fileListWidget.currentItem())
+            self.on_file_item_changed(self.ui.fileListWidget.currentRow())
 
     def on_next_button_clicked(self):
         row = self.ui.fileListWidget.currentRow()
         total = self.ui.fileListWidget.count()
         if row < total - 1:
             self.ui.fileListWidget.setCurrentRow(row + 1)
-            self.on_file_item_clicked(self.ui.fileListWidget.currentItem())
+            self.on_file_item_changed(self.ui.fileListWidget.currentRow())
 
     def on_file_delete_button_clicked(self):
         item = self.ui.fileListWidget.currentItem()
+        prev_index = self.ui.fileListWidget.currentRow()
         if not item:
             print("[WARN] No item selected")
             return
@@ -444,8 +484,12 @@ class MainWindow(QMainWindow):
 
             if deleted:
                 print("[INFO] Files deleted")
-                self.on_prev_button_clicked()
                 self.refresh_file_list()
+                count = self.ui.fileListWidget.count()
+                if prev_index >= count:
+                    prev_index = count - 1  # 마지막 인덱스로 조정
+
+                self.ui.fileListWidget.setCurrentRow(prev_index)
 
             else:
                 QMessageBox.warning(self, "삭제 실패", "파일 삭제에 실패했습니다.")
@@ -560,4 +604,161 @@ class MainWindow(QMainWindow):
         self.load_class_names(yaml_path)
 
     def save_drawn_box(self, xc, yc, w, h):
-        print(f"{xc:.6f} {yc:.6f} {w:.6f} {h:.6f}\n")
+        if not self.is_image_preview:
+            return
+
+        label_path = self.last_preview_label_path
+        if not label_path:
+            print("[WARN] No label path set.")
+            return
+
+        editable = self.ui.EditCheckBox.isChecked()
+        if not editable:
+            QMessageBox.information(
+                self,
+                "편집 불가",
+                "수정을 하려면 [Edit] 체크박스를 먼저 선택해주세요."
+            )
+            return
+
+        lines = []
+        valid = True
+
+        # 1. 기존 파일이 존재하면 읽어서 검증
+        if os.path.exists(label_path):
+            with open(label_path, 'r') as f:
+                for line in f:
+                    parts = line.strip().split(' ')
+                    if len(parts) != 5:
+                        valid = False
+                        break
+                    try:
+                        int(parts[0])
+                        float(parts[1])
+                        float(parts[2])
+                        float(parts[3])
+                        float(parts[4])
+                    except ValueError:
+                        valid = False
+                        break
+                    lines.append(line.strip())
+
+        # 2. 클래스 ID는 savedClassListWidget에서 현재 선택된 항목 기준
+        selected_index = self.ui.classListWidget.currentRow()
+        if selected_index == -1:
+            print("[WARN] No class selected from savedClassListWidget.")
+            return
+
+        new_line = f"{selected_index} {xc:.6f} {yc:.6f} {w:.6f} {h:.6f}"
+
+        # 3. 파일 다시 작성
+        with open(label_path, 'w') as f:
+            if valid:
+                for line in lines:
+                    f.write(line + '\n')
+            f.write(new_line + '\n')
+
+        # UI 갱신
+        item = self.ui.fileListWidget.currentItem()
+        if item:
+            item.setForeground(Qt.blue)
+        self.on_file_item_changed(self.ui.fileListWidget.currentRow())
+        count = self.ui.savedClassListWidget.count()
+        if count > 0:
+            self.ui.savedClassListWidget.setCurrentRow(count - 1)
+
+
+    def on_saved_label_clicked(self, selected_index):
+        if not self.saved_boxes or not self.last_preview_image_path or selected_index == -1:
+            return
+
+        image = QImage(self.last_preview_image_path)
+        pixmap = QPixmap.fromImage(image)
+        painter = QPainter(pixmap)
+
+        for idx, box in enumerate(self.saved_boxes):
+            rect = box['rect']
+            label = box['label']
+
+            # ✅ 선택된 박스는 초록색, 나머지는 빨간색
+            color = Qt.green if idx == selected_index else Qt.red
+            painter.setPen(QPen(color, 2))
+            painter.drawRect(rect)
+            painter.setPen(Qt.green)
+            painter.drawText(rect.topLeft() + QPointF(2, 12), label)
+
+        painter.end()
+        self.ui.videoLabel.setImage(pixmap, [])
+
+    def on_delete_saved_label_clicked(self):
+        label_path = self.last_preview_label_path
+
+        if not label_path or not os.path.exists(label_path):
+            print("[WARN] No label file to modify.")
+            return
+
+        selected_index = self.ui.savedClassListWidget.currentRow()
+        if selected_index == -1:
+            print("[WARN] No label selected to delete.")
+            return
+
+        editable = self.ui.EditCheckBox.isChecked()
+        if not editable:
+            QMessageBox.information(
+                self,
+                "편집 불가",
+                "수정을 하려면 [Edit] 체크박스를 먼저 선택해주세요."
+            )
+            return
+
+        # 현재 삭제 대상 클래스 ID 및 좌표
+        target = self.saved_boxes[selected_index]
+        class_id = target['class_id']
+        target_rect = target['rect']
+
+        lines_to_keep = []
+        with open(label_path, 'r') as f:
+            for line in f:
+                parts = line.strip().split(' ')
+                if len(parts) != 5:
+                    continue  # Skip invalid
+
+                try:
+                    cid = int(parts[0])
+                    xc, yc, w, h = map(float, parts[1:])
+                except ValueError:
+                    continue  # Skip malformed lines
+
+                # 박스 비교를 위해 YOLO → 픽셀 좌표로 변환
+                iw = self.current_frame.width()
+                ih = self.current_frame.height()
+                x1 = (xc - w / 2) * iw
+                y1 = (yc - h / 2) * ih
+                rect = QRectF(x1, y1, w * iw, h * ih)
+
+                # 직사각형이 유사하지 않으면 keep
+                if cid != class_id or not self._rects_almost_equal(rect, target_rect):
+                    lines_to_keep.append(line.strip())
+
+        # 라벨 파일 덮어쓰기
+        with open(label_path, 'w') as f:
+            for line in lines_to_keep:
+                f.write(line + '\n')
+
+        # UI 갱신
+        self.on_file_item_changed(self.ui.fileListWidget.currentRow())
+        count = self.ui.savedClassListWidget.count()
+        if count > 0:
+            self.ui.savedClassListWidget.setCurrentRow(count - 1)
+        else:
+            item = self.ui.fileListWidget.currentItem()
+            if item:
+                item.setForeground(QColor("orange"))
+
+    def _rects_almost_equal(self, r1: QRectF, r2: QRectF, tol=3.0):
+        return (
+            abs(r1.x() - r2.x()) < tol and
+            abs(r1.y() - r2.y()) < tol and
+            abs(r1.width() - r2.width()) < tol and
+            abs(r1.height() - r2.height()) < tol
+        )

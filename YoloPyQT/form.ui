@@ -16,7 +16,10 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="mainLayout" stretch="1,4,1">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1,0,0,0,6,0,6,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1,0,0,0,6,0,0,6,0">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLabel" name="label_inf">
         <property name="font">
@@ -26,6 +29,9 @@
         </property>
         <property name="text">
          <string>[추론 네트워크]</string>
+        </property>
+        <property name="margin">
+         <number>6</number>
         </property>
        </widget>
       </item>
@@ -144,10 +150,19 @@
         <property name="text">
          <string>[클래스]</string>
         </property>
+        <property name="margin">
+         <number>6</number>
+        </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>12</number>
+        </property>
         <item>
          <widget class="QLineEdit" name="classNameEdit">
           <property name="enabled">
@@ -188,6 +203,9 @@
         <property name="text">
          <string>클래스 목록</string>
         </property>
+        <property name="margin">
+         <number>6</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -200,16 +218,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>저장된 클래스 목록</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QListWidget" name="savedClassListWidget"/>
-      </item>
-      <item>
        <widget class="QPushButton" name="deleteClassButton">
         <property name="enabled">
          <bool>false</bool>
@@ -217,13 +225,64 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>31</height>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
           <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>🗑</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>저장된 클래스 목록</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="EditCheckBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Edit</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QListWidget" name="savedClassListWidget">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteSavedClassButton">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
@@ -259,6 +318,9 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="sidePanelLayout" stretch="0,0,0,0,0,0,0,0">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLabel" name="label_ws">
         <property name="font">
@@ -269,10 +331,16 @@
         <property name="text">
          <string>[Yolov8 작업 폴더]</string>
         </property>
+        <property name="margin">
+         <number>6</number>
+        </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
         <property name="bottomMargin">
          <number>12</number>
         </property>
@@ -343,6 +411,9 @@
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
+        <property name="margin">
+         <number>6</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -356,7 +427,7 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>29</height>
+          <height>34</height>
          </size>
         </property>
         <property name="font">
@@ -365,7 +436,7 @@
          </font>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -390,6 +461,15 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QPushButton" name="prevButton">
           <property name="enabled">
@@ -425,7 +505,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>31</height>
+            <height>36</height>
            </size>
           </property>
           <property name="font">
